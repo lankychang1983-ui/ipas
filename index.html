@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物聯網應用工程師初級能力鑑定 - 50題模擬試卷</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header / Navbar -->
+    <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-microchip text-indigo-400 text-2xl"></i>
+                <h1 class="font-bold text-lg sm:text-xl tracking-wide">物聯網應用工程師初級線上試卷</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="hidden sm:flex items-center space-x-2 text-sm bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+                    <i class="fa-regular fa-clock text-amber-400"></i>
+                    <span>考試時間：</span>
+                    <span id="timer" class="font-mono font-semibold text-amber-400">60:00</span>
+                </div>
+                <button id="submitBtnTop" onclick="confirmSubmit()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-all shadow">
+                    提交交卷
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <!-- Left / Quiz Area (3 cols) -->
+        <section class="lg:col-span-3 space-y-6">
+
+            <!-- Banner / Quiz Info -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900">113-112歷年綜合精選試題 (50題)</h2>
+                    <p class="text-slate-500 text-sm mt-1">配分說明：每題 2 分，共 50 題，滿分 100 分（60分及格）。</p>
+                </div>
+                <div class="flex items-center space-x-3 text-xs font-medium">
+                    <span class="bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full border border-indigo-100">單選題</span>
+                    <span class="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full border border-emerald-100">即時評分</span>
+                </div>
+            </div>
+
+            <!-- Quiz Questions Container -->
+            <div id="questionsContainer" class="space-y-6">
+                <!-- Dynamically generated via JS -->
+            </div>
+
+            <!-- Bottom Action Bar -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
+                <div class="text-sm text-slate-500">
+                    已完成 <span id="answeredCountBottom" class="font-bold text-indigo-600">0</span> / 50 題
+                </div>
+                <button onclick="confirmSubmit()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-6 py-2.5 rounded-xl shadow transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>結算分數並查看解答</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Right / Sidebar Navigation & Results (1 col) -->
+        <aside class="lg:col-span-1 space-y-6">
+
+            <!-- Score Result Card (Initially Hidden / Shown on Submit) -->
+            <div id="resultCard" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                <h3 class="text-slate-500 font-semibold text-sm uppercase tracking-wider">測驗結果成績</h3>
+                <div class="my-4">
+                    <span id="scoreDisplay" class="text-5xl font-black text-indigo-600">0</span>
+                    <span class="text-slate-400 font-medium text-lg">/ 100 分</span>
+                </div>
+                <div id="passBadge" class="inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-3">
+                    --
+                </div>
+                <p id="resultSummary" class="text-sm text-slate-600 mb-4">--</p>
+                <button onclick="resetQuiz()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold py-2.5 rounded-xl transition">
+                    <i class="fa-solid fa-rotate-right mr-1"></i> 重新測驗
+                </button>
+            </div>
+
+            <!-- Navigation Grid Card -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm sticky top-20">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-slate-900 text-sm">題目答題地圖</h3>
+                    <span class="text-xs text-slate-500"><span id="answeredCount" class="font-bold text-indigo-600">0</span>/50 已填寫</span>
+                </div>
+
+                <!-- 10x5 Grid -->
+                <div id="questionGrid" class="grid grid-cols-5 gap-2 max-h-[360px] overflow-y-auto custom-scrollbar p-1">
+                    <!-- Dynamically generated buttons -->
+                </div>
+
+                <div class="mt-5 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs text-slate-500">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-slate-100 border border-slate-300"></span>
+                        <span>未答</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-indigo-600"></span>
+                        <span>已答</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                        <span>答對</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                        <span>答錯</span>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+    </main>
+
+    <!-- Quiz JS Logic -->
+    <script>
+        // 50 Questions Data Source
+        const quizData = [
+            {
+                id: 1,
+                question: "下列哪一種感測器可用於監控居家中的瓦斯漏氣？",
+                options: ["(A) 壓力感測器", "(B) 光學感測器", "(C) 溫度和濕度感測器", "(D) 氣體感測器"],
+                answer: 3,
+                rationale: "瓦斯（如甲烷、液化石油氣）漏氣監測需採用氣體感測器（Gas Sensor），例如 MQ 系列感測器。"
+            },
+            {
+                id: 2,
+                question: "霍爾感測器（Hall Sensor）能監測磁場變化，適合用於偵測下列哪一項特性？",
+                options: ["(A) 亮度", "(B) 位移", "(C) 頻率", "(D) 氣壓"],
+                answer: 1,
+                rationale: "霍爾感測器透過感測磁場強弱變化，常用於測量物體的位置變化與微小位移、轉速等物理量。"
+            },
+            {
+                id: 3,
+                question: "執行 RFID 品項貼標時，為防止 EPC 資料內容遭竄改，要求永久不可更改 EPC 資料內容，寫入標籤資料時需下達下列哪一個指令？",
+                options: ["(A) lock", "(B) erase", "(C) kill", "(D) permalock"],
+                answer: 3,
+                rationale: "permalock（永久鎖定）指令可確保標籤內 EPC 數據永久唯讀無法再被修改或覆寫。"
+            },
+            {
+                id: 4,
+                question: "由於物聯網裝置的網路頻寬資源有限，因此下列哪一項通訊協定最『不』適合物聯網系統應用？",
+                options: ["(A) MQTT", "(B) FTP", "(C) DDS", "(D) CoAP"],
+                answer: 1,
+                rationale: "FTP (File Transfer Protocol) 表頭與傳輸開銷大，不適合頻寬與記憶體受限的 IoT 裝置；MQTT 與 CoAP 才是輕量化標配。"
+            },
+            {
+                id: 5,
+                question: "物聯網應用中，長距離通訊協定 LoRa 與 NB-IoT 的最大差異為何？",
+                options: [
+                    "(A) LoRa 與 NB-IoT 傳輸距離分別為 5 公里及 50 公里",
+                    "(B) LoRa 使用免授權的 Sub-1GHz ISM 頻段，NB-IoT 使用需授權的 GSM/LTE 頻段",
+                    "(C) LoRa 為高功耗，NB-IoT 為低功耗",
+                    "(D) NB-IoT 無法在電信基地台架構下運作"
+                ],
+                answer: 1,
+                rationale: "LoRa 採用免授權非授權頻段 (Sub-1GHz) 非對稱佈建；NB-IoT 則採用電信營運商需授權的蜂巢式頻段。"
+            },
+            {
+                id: 6,
+                question: "提供開發平台，包含作業系統、程式語言執行環境、資料庫及網頁伺服器，是指下列哪一項雲端服務模式？",
+                options: ["(A) SaaS", "(B) PaaS", "(C) IaaS", "(D) DaaS"],
+                answer: 1,
+                rationale: "Platform as a Service (PaaS) 提供應用程式開發與運行的平台環境服務。"
+            },
+            {
+                id: 7,
+                question: "關於 EddyStone 與 iBeacon 的敘述，下列哪一項錯誤？",
+                options: [
+                    "(A) EddyStone 同時支援 Android 和 iOS 裝置",
+                    "(B) Eddystone-UID 是其共享訊息之一",
+                    "(C) iBeacon-TLM 是 iBeacon 規範共享的訊息之一",
+                    "(D) iBeacon 為 Apple 公司推廣的藍牙信標規範"
+                ],
+                answer: 2,
+                rationale: "TLM (Telemetry) 遙測封包是 Google Eddystone 的標準格式之一，非 Apple iBeacon 的規範。"
+            },
+            {
+                id: 8,
+                question: "大多數智慧型手機並『未』原生支援下列哪一種無線通訊技術？",
+                options: ["(A) ZigBee", "(B) Bluetooth", "(C) NFC", "(D) Wi-Fi"],
+                answer: 0,
+                rationale: "智慧型手機普遍內建 Wi-Fi, BLE, NFC，但一般不內建 ZigBee 晶片（需透過 Smart Gateway 轉接）。"
+            },
+            {
+                id: 9,
+                question: "下列哪一種硬體設備最適合用於邊緣運算（Edge Computing）？",
+                options: ["(A) Arduino Uno", "(B) ESP32", "(C) Raspberry Pi", "(D) LinkIt 7697"],
+                answer: 2,
+                rationale: "Raspberry Pi 為單板電腦 (SBC)，具備較強的 CPU/RAM 資源與完整 OS，最符合現場邊緣運算需求。"
+            },
+            {
+                id: 10,
+                question: "開發一個具備人臉辨識功能的物聯網系統，應使用下列哪一個影像處理與電腦視覺模組？",
+                options: ["(A) Pandas", "(B) Matplotlib", "(C) OpenCV", "(D) GPIO"],
+                answer: 2,
+                rationale: "OpenCV (Open Source Computer Vision Library) 是目前最主流的開源電腦視覺與影像辨識庫。"
+            },
+            {
+                id: 11,
+                question: "物聯網系統建好後，發現感測器讀值浮動。檢查發現是感測器模組對外的『唯二』信號線沒接好，接好後恢復正常。請問這兩條線『不可能』是何種介面？",
+                options: ["(A) I²C", "(B) UART", "(C) SPI", "(D) CAN"],
+                answer: 2,
+                rationale: "SPI 介面最少需要 4 條線 (MISO, MOSI, SCLK, CS/SS)；I²C 只有 2 條線 (SDA, SCL)，UART 只有 2 條線 (TX, RX)。"
+            },
+            {
+                id: 12,
+                question: "使用 Web-API 連結政府資料開放平台，發現資料無法更新且 URI 回覆 HTTP 狀態碼 404，請問表示何種錯誤？",
+                options: [
+                    "(A) 連結的 URI 找不到資源",
+                    "(B) 請求正在處理中",
+                    "(C) 請求次數超過上限",
+                    "(D) 伺服器內部發生 500 錯誤"
+                ],
+                answer: 0,
+                rationale: "HTTP Status Code 404 代表 Not Found，表示客戶端請求的目標網址或資源不存在。"
+            },
+            {
+                id: 13,
+                question: "MQTT 通訊協定定義了多種傳輸服務品質層級（QoS Level），下列哪一個層級『不』保證資料一定會送達目的端？",
+                options: ["(A) Level 0", "(B) Level 1", "(C) Level 2", "(D) Level 3"],
+                answer: 0,
+                rationale: "QoS Level 0 為『最多傳送一次』(At most once)，發送後即不管，不保證送達也無確認機制。"
+            },
+            {
+                id: 14,
+                question: "關於微控制器及 Arduino 之 SPI 介面（Serial Peripheral Interface），下列敘述何者錯誤？",
+                options: [
+                    "(A) 是一種同步 (Synchronous)、全雙工 (Full Duplex) 通訊協定",
+                    "(B) 主控裝置 (Master) 可從多個從屬裝置 (Slave) 選擇通訊對象",
+                    "(C) MOSI 為主控輸出、從屬輸入",
+                    "(D) 以 SPI 連接裝置時，除了 GND 訊號外，只需連接 MISO、MOSI、SCLK 等 3 個腳位即可運作"
+                ],
+                answer: 3,
+                rationale: "SPI 除了 MISO, MOSI, SCLK 之外，每個從屬設備還需要至少一條 SS/CS (Chip Select) 晶片選擇線才能通訊。"
+            },
+            {
+                id: 15,
+                question: "關於中斷（Interrupt）與輪詢（Polling），下列敘述何者正確？",
+                options: [
+                    "(A) 中斷要求主要是由周邊裝置 (Peripherals) 主動發出",
+                    "(B) 輪詢的效率較中斷高",
+                    "(C) 發生中斷事件代表系統發生嚴重故障異常",
+                    "(D) 輪詢不需要消耗 CPU 週期資源"
+                ],
+                answer: 0,
+                rationale: "中斷由周邊裝置在發生事件時向 CPU 發起，可大幅提升 CPU 處理效率；輪詢則是 CPU 主動不斷詢問。"
+            },
+            {
+                id: 16,
+                question: "智慧農業雲端平台採用 JSON 而非 CSV 作為物聯網資料交換格式的最主要原因為何？",
+                options: [
+                    "(A) CSV 格式只支援 ASCII 字元",
+                    "(B) CSV 格式無法寫入資料庫",
+                    "(C) JSON 資料保密性較高",
+                    "(D) JSON 格式可以表達數據層級與結構關係"
+                ],
+                answer: 3,
+                rationale: "JSON 支援物件與陣列巢狀層級結構 (Hierarchical Data)，適合表現多維度、複雜的物聯網感測數據。"
+            },
+            {
+                id: 17,
+                question: "下列何者為感測器元件中負責感測物理量（如溫度、壓力、光線等）並將其轉換為電子訊號的核心模組？",
+                options: ["(A) 感測模組", "(B) 通訊模組", "(C) 容錯模組", "(D) 電源模組"],
+                answer: 0,
+                rationale: "感測模組（Sensor Module）內部感測元件負責接收環境物理訊號並轉為電訊號。"
+            },
+            {
+                id: 18,
+                question: "在智慧家庭中，下列何者感測器使用雷射光束照射空氣中的微粒，測量散射光來確定微粒濃度？",
+                options: ["(A) 防盜警報", "(B) 來客告知", "(C) 智慧燈具", "(D) PM2.5 偵測感測器"],
+                answer: 3,
+                rationale: "PM2.5 雷射懸浮微粒感測器原理是運用雷射光散射原理 (Laser Scattering) 測量空氣中懸浮微粒濃度。"
+            },
+            {
+                id: 19,
+                question: "國家通訊傳播委員會（NCC）公佈低功率射頻電機技術規範，台灣所使用的 UHF RFID 官方指定頻率範圍為何？",
+                options: ["(A) 475.5MHz 至 476.5MHz", "(B) 467.4MHz 至 467.5MHz", "(C) 922MHz 至 928MHz", "(D) 402MHz 至 405MHz"],
+                answer: 2,
+                rationale: "台灣 NCC 規範之超高頻 UHF RFID 指定頻段為 922 MHz ~ 928 MHz。"
+            },
+            {
+                id: 20,
+                question: "關於條碼與 RFID 技術的比較，下列敘述何者錯誤？",
+                options: [
+                    "(A) 隔著紙箱可同時讀取內部多個 RFID 標籤，但條碼不行",
+                    "(B) RFID 技術可進行防偽，條碼較難",
+                    "(C) RFID 技術無法複寫、變更資料，商品條碼則可以加密資料",
+                    "(D) RFID 的單枚成本相較於條碼成本高"
+                ],
+                answer: 2,
+                rationale: "RFID（尤其是可讀寫標籤）資料可重複讀寫修改，而條碼一經列印即不可修改且無法加密。"
+            },
+            {
+                id: 21,
+                question: "ZigBee 協定疊層中，由下而上（實體層起）的正確排序為何？",
+                options: [
+                    "(A) 實體層、網路層、媒體存取層、應用層",
+                    "(B) 實體層、媒體存取層、網路層、應用層",
+                    "(C) 媒體存取層、實體層、應用層、網路層",
+                    "(D) 網路層、實體層、媒體存取層、應用層"
+                ],
+                answer: 1,
+                rationale: "ZigBee 架構底層為 IEEE 802.15.4 的 PHY (實體層) 與 MAC (媒體存取層)，之上為 Network (網路層) 與 Application (應用層)。"
+            },
+            {
+                id: 22,
+                question: "在區域網路或物聯網設備中，DHCP 協定主要用於下列何種用途？",
+                options: [
+                    "(A) 從網域名稱查詢主機 IP 位址",
+                    "(B) 確保傳輸時的內容是加密的",
+                    "(C) 自動分配網路 IP 位址與相關參數",
+                    "(D) 查詢網路最佳路由"
+                ],
+                answer: 2,
+                rationale: "DHCP (Dynamic Host Configuration Protocol) 動態主機設定協定專門自動分配 IP 位址給連網設備。"
+            },
+            {
+                id: 23,
+                question: "自動駕駛車輛開發中，常用於精準無人駕駛與防碰撞環境測繪的 LIDAR 技術是指何者？",
+                options: ["(A) 光學雷達 (Light Detection and Ranging)", "(B) 超音波感測器", "(C) 毫米波雷達", "(D) 紅外線貼地鏡頭"],
+                answer: 0,
+                rationale: "LIDAR (Laser Imaging, Detection, and Ranging) 使用脈衝雷射光測量與目標的距離並建立 3D 光雲圖。"
+            },
+            {
+                id: 24,
+                question: "欲使穿戴式裝置（如智慧手環）具備跌倒偵測功能，採用下列何種感測元件最為合適？",
+                options: ["(A) 三軸加速度感測器", "(B) 雷射測距儀", "(C) 光感測器", "(D) 超音波感測器"],
+                answer: 0,
+                rationale: "三軸加速度計能瞬間偵測重力加速度變化（如人體突發性撞擊與姿態轉變），最常用於跌倒偵測。"
+            },
+            {
+                id: 25,
+                question: "JSON 已是跨系統資料交換主要格式。若感測元件收集到的數據轉成 JSON，後端最適合選擇下列哪種 NoSQL 資料庫來原生儲存？",
+                options: ["(A) SQL Server", "(B) SQLite", "(C) Oracle", "(D) MongoDB"],
+                answer: 3,
+                rationale: "MongoDB 為文件導向 (Document-oriented) NoSQL 資料庫，原生以 BSON (JSON 的二進位格式) 儲存資料。"
+            },
+            {
+                id: 26,
+                question: "在 HTTP Web Service 設計中，下列哪一種請求方法『不』應該將機敏性資料放入傳輸（因參數會顯露於 URL 中）？",
+                options: ["(A) GET", "(B) POST", "(C) PUT", "(D) DELETE"],
+                answer: 0,
+                rationale: "GET 請求將參數附加在 URL 後方（Query String），會在瀏覽器歷史與伺服器 Log 留下記錄，不可用於傳送密碼等敏感資料。"
+            },
+            {
+                id: 27,
+                question: "對沒有回應的物聯網設備進行現場故障排除時，要確認設備是否有正常通電運作，最科學且安全的物理檢測方法為何？",
+                options: [
+                    "(A) 聞看看是否有燒焦味",
+                    "(B) 使用三用電表測量輸入電壓與電流",
+                    "(C) 觸碰晶片看是否發燙",
+                    "(D) 拍打敲擊設備"
+                ],
+                answer: 1,
+                rationale: "使用三用電表（Multimeter）測量電源端電壓與電流是標準且科學的安全故障判斷量測法。"
+            },
+            {
+                id: 28,
+                question: "在物聯網安全中，哪種機制可確保訊息的發送者無法否認其已發送過該訊息，從而提供『不可否認性』（Non-repudiation）？",
+                options: ["(A) 對稱加密", "(B) 雜湊演算法", "(C) 防暴力破解機制", "(D) 數位簽章 (Digital Signature)"],
+                answer: 3,
+                rationale: "數位簽章結合非對稱加密與雜湊算法，能達成發送者身份驗證、資料完整性及『不可否認性』。"
+            },
+            {
+                id: 29,
+                question: "關於微控制器上常見的匯流排介面，I²C 屬於下列何種傳輸模式？",
+                options: ["(A) 全雙工 (Full-Duplex)", "(B) 半雙工 (Half-Duplex)", "(C) 單工 (Simplex)", "(D) 非同步 (Asynchronous)"],
+                answer: 1,
+                rationale: "I²C 使用 SDA 單條資料線傳送與接收資料，因此同一時間只能單向傳送，屬於半雙工 (Half-Duplex) 通訊。"
+            },
+            {
+                id: 30,
+                question: "使用微控制器（如 Arduino）GPIO 接腳控制繼電器 (Relay) 時，若驅動電流或電壓不足，可額外加入下列何種電子元件來放大電流以順利驅動？",
+                options: ["(A) 電容", "(B) 電感", "(C) 電阻", "(D) 電晶體 (Transistor)"],
+                answer: 3,
+                rationale: "GPIO 腳位輸出電流小（通常 20mA~40mA），需加上電晶體 (NPN/MOSFET) 作為開關與電流放大來驅動繼電器線圈。"
+            },
+            {
+                id: 31,
+                question: "WebSocket 協定在物聯網網頁數據顯示中的主要優點為何？",
+                options: [
+                    "(A) 提供持久性連接與雙向即時資料傳輸",
+                    "(B) 適合儲存大量檔案",
+                    "(C) 替代 HTTP 進行網頁樣式渲染",
+                    "(D) 完全不需要消耗網路頻寬"
+                ],
+                answer: 0,
+                rationale: "WebSocket 建立了伺服器與客戶端之間的全雙工持久連接，延遲極低，非常適合 IoT 即時數據儀表板。"
+            },
+            {
+                id: 32,
+                question: "下列何種通訊協定是專為工業自動化領域（如 PLC 與設備間）發展出的跨平台資料交換標準？",
+                options: ["(A) MQTT", "(B) CoAP", "(C) HTTP", "(D) OPC UA"],
+                answer: 3,
+                rationale: "OPC UA (Open Platform Communications Unified Architecture) 是工業 4.0 自動化的獨立跨平台標準通訊協定。"
+            },
+            {
+                id: 33,
+                question: "Beacon 裝置運作時，主要是採用下列何者無線通訊協向周邊手機廣播代碼？",
+                options: ["(A) 5G", "(B) NFC", "(C) Wi-Fi", "(D) Bluetooth (BLE)"],
+                answer: 3,
+                rationale: "Beacon 廣播裝置採用 Bluetooth Low Energy (BLE) 的 Advertising 封包進行短距離無線微定位廣播。"
+            },
+            {
+                id: 34,
+                question: "陀螺儀（Gyroscope）感測器的基本物理量測原理是基於下列何者？",
+                options: ["(A) 能量守恆定律", "(B) 質量守恆定律", "(C) 角動量守恆定律", "(D) 萬有引力定律"],
+                answer: 2,
+                rationale: "陀螺儀基於角動量守恆（Conservation of Angular Momentum）原理，量測物體旋轉的角速度。"
+            },
+            {
+                id: 35,
+                question: "關於 IEEE 802.11ax (Wi-Fi 6) 中引進的 OFDMA 技術，下列敘述何者錯誤？",
+                options: [
+                    "(A) 主要功能為改善網路多裝置高密度下的傳輸效能",
+                    "(B) 傳輸資料時，必須將不同用戶的資料合併為單一較大封包才能進行傳送",
+                    "(C) 將通道再細分為數個子載波 (Resource Unit, RU)",
+                    "(D) 能有效降傳輸延遲"
+                ],
+                answer: 1,
+                rationale: "OFDMA 是將頻道劃分為多個 Resource Units (RU) 同時分配給不同用戶，不需要將不同用戶打包為單一封包。"
+            },
+            {
+                id: 36,
+                question: "關於 IPv6 通訊協定，下列敘述何者正確？",
+                options: [
+                    "(A) 位於 OSI 模型的傳輸層",
+                    "(B) IPv6 位址長度為 64 位元",
+                    "(C) IPv6 與 IPv4 無法直接互相傳遞資料封包，需透過轉換機制",
+                    "(D) IPv6 不支援任何加密功能"
+                ],
+                answer: 2,
+                rationale: "IPv4 與 IPv6 封包格式不同無法直接連通，需經由 Dual-Stack, Tunneling 或 NAT64 轉換；IPv6 位址長度為 128 位元。"
+            },
+            {
+                id: 37,
+                question: "關於雲端服務模式，Google Docs 屬於下列何種架構？",
+                options: ["(A) SaaS (Software as a Service)", "(B) PaaS", "(C) IaaS", "(D) DaaS"],
+                answer: 0,
+                rationale: "Google Docs 是直接透過瀏覽器使用的雲端應用軟體服務，屬於 SaaS 模式。"
+            },
+            {
+                id: 38,
+                question: "在 EPCglobal 標準中，ONS (Object Name Service) 的功能與網際網路中何種服務最為相似？",
+                options: ["(A) DHCP", "(B) FTP", "(C) DNS (Domain Name System)", "(D) NAT"],
+                answer: 2,
+                rationale: "ONS (物件名稱解析服務) 運作機制如同 DNS，將 RFID EPC 碼解析並指向對應產品資料庫伺服器的 URL。"
+            },
+            {
+                id: 39,
+                question: "關於 Docker 容器技術，下列敘述何者『不』正確？",
+                options: [
+                    "(A) 只能安裝與運行於 Windows 作業系統環境",
+                    "(B) 比傳統虛擬機 (VM) 更高效利用系統資源",
+                    "(C) 屬於作業系統層級 (OS-level) 的虛擬化技術",
+                    "(D) 使用沙盒 (Sandbox) 機制確保容器間相互隔離"
+                ],
+                answer: 0,
+                rationale: "Docker 為跨平台容器技術，廣泛運行於 Linux, macOS 及 Windows 等多種作業系統。"
+            },
+            {
+                id: 40,
+                question: "Modbus RTU 通訊協定在工業物聯網中極為常見，下列關於 Modbus 的敘述何者錯誤？",
+                options: [
+                    "(A) Modbus RTU 採用序列通訊架構（如 RS-485）",
+                    "(B) 可藉由 TCP/IP 封包進行傳送 (Modbus TCP)",
+                    "(C) 資料交換格式需定義暫存器型態與位址",
+                    "(D) 資料型態與位元組次序 (Endianness) 均有統一強制規定，無需工程師特別設定"
+                ],
+                answer: 3,
+                rationale: "Modbus 協定並未強制規範多位元組資料的 Endianness（大端/小端序），開發者需自行協調處理大小序轉換。"
+            },
+            {
+                id: 41,
+                question: "pH 值感測器主要是透過檢測溶液中的何種離子濃度來確定酸鹼度？",
+                options: ["(A) 氫離子 ($H^+$)", "(B) 氫氧根離子 ($OH^-$)", "(C) 氯離子 ($Cl^-$)", "(D) 鈉離子 ($Na^+$)"],
+                answer: 0,
+                rationale: "pH 值定義即為溶液中氫離子濃度的負對數：$pH = -\\log_{10}[H^+]$。"
+            },
+            {
+                id: 42,
+                question: "當物聯網雲平台需要處理與儲存海量資料，而單一資料庫主機效能不足時，通常會採用下列何種資料庫水平分片擴展技術？",
+                options: ["(A) Shipping", "(B) Sharding", "(C) Sharing", "(D) Mirroring"],
+                answer: 1,
+                rationale: "Sharding（資料庫分片）是將大規模數據水平切分儲存於多台獨立資料庫伺服器的擴展技術。"
+            },
+            {
+                id: 43,
+                question: "環境光感測器（Ambient Light Sensor）主要利用下列何種元件作為光電轉換核心？",
+                options: ["(A) 光電二極體 (Photodiode)", "(B) 熱敏電阻", "(C) 超音波探頭", "(D) 壓電陶瓷片"],
+                answer: 0,
+                rationale: "光電二極體 (Photodiode) 受到光照時會產生對應的光電流，常用於測量光照強度。"
+            },
+            {
+                id: 44,
+                question: "在微控制器數位介面中，常利用 Pulse Width Modulation (PWM) 來模擬類比輸出。請問 PWM 與下列哪一個硬體模組最為相關？",
+                options: ["(A) 定時器/計數器 (Timer)", "(B) 串列埠 (UART)", "(C) 類比數位轉換器 (ADC)", "(D) EEPROM"],
+                answer: 0,
+                rationale: "PWM 脈波寬度調變本質上是由微控制器內部的 Timer (計數器與比較暫存器) 產生的波形。"
+            },
+            {
+                id: 45,
+                question: "關於非對稱式金鑰加密（Asymmetric Encryption）的運作，若 A 欲傳送秘密文件給 B，A 應使用何種金鑰進行加密，才能保證『只有 B 能夠解密』？",
+                options: ["(A) A 的私有金鑰", "(B) A 的公開金鑰", "(C) B 的私有金鑰", "(D) B 的公開金鑰"],
+                answer: 3,
+                rationale: "用接收者 B 的公開金鑰（Public Key）加密，只有擁有對應 B 的私有金鑰（Private Key）的 B 才能解密。"
+            },
+            {
+                id: 46,
+                question: "使用微控制器（5V 邏輯準位）驅動一個壓降為 1.8V 的紅色 LED，若限制流經 LED 的電流不得超過 30mA，則限流電阻至少應選用多少歐姆？",
+                options: ["(A) 80 歐姆", "(B) 110 歐姆", "(C) 220 歐姆", "(D) 470 歐姆"],
+                answer: 1,
+                rationale: "根據歐姆定律：$R = \\frac{V_{CC} - V_{LED}}{I} = \\frac{5V - 1.8V}{0.03A} = \\frac{3.2V}{0.03A} \\approx 106.67 \\Omega$，故最少需選用 110 歐姆。"
+            },
+            {
+                id: 47,
+                question: "在智慧製造中，關於可程式化邏輯控制器（PLC）與單晶片微控制器（Microcontroller）的比較，下列何者正確？",
+                options: [
+                    "(A) PLC 具備極高的即時性、抗干擾能力與穩定度，適合嚴苛工業現場環境",
+                    "(B) 微控制器比 PLC 更容易直接連結 220V 工業高壓電",
+                    "(C) PLC 的價格比一般微控制器開發板便宜",
+                    "(D) 單晶片微控制器無法進行程式撰寫"
+                ],
+                answer: 0,
+                rationale: "PLC 專為工業現場設計，具備強大抗雜訊干擾、高穩定度與階梯圖程式介面。"
+            },
+            {
+                id: 48,
+                question: "在智慧物流應用中，若要針對移動中的車輛進行全天候廣域動態追蹤，主要會結合下列哪組技術？",
+                options: [
+                    "(A) NFC + 藍牙短距離傳輸",
+                    "(B) GPS 定位 + 行動通訊網路 (4G/5G)",
+                    "(C) 條碼掃描 + Wi-Fi",
+                    "(D) 超音波 + ZigBee"
+                ],
+                answer: 1,
+                rationale: "GPS 提供全球車輛座標定位，配合 4G/5G 蜂巢式網路將位置資訊回傳雲端平台進行運力調配。"
+            },
+            {
+                id: 49,
+                question: "有關近場通訊（NFC）技術的敘述，下列何者錯誤？",
+                options: [
+                    "(A) 支援點對點模式 (P2P)",
+                    "(B) 支援卡片模擬模式 (Card Emulation)",
+                    "(C) 運作於 2.4GHz 超高頻段",
+                    "(D) 運作於 13.56 MHz 高頻段"
+                ],
+                answer: 2,
+                rationale: "NFC 運作於 13.56 MHz 短距離高頻 (HF) 頻段，非 2.4 GHz。"
+            },
+            {
+                id: 50,
+                question: "智慧物聯網（AIoT）發展中，邊緣運算（Edge Computing）的核心優勢不包含下列何者？",
+                options: [
+                    "(A) 降低資料回傳雲端的網路延遲",
+                    "(B) 減少骨幹網路頻寬消耗",
+                    "(C) 提升在地即時響應與隱私保護",
+                    "(D) 能夠徹底取代雲端資料中心的所有儲存與運算需求"
+                ],
+                answer: 3,
+                rationale: "邊緣運算與雲端運算為互補關係（協同架構），邊緣處理即時性資料，雲端負責海量數據模型訓練與長期分析，無法完全取代雲端。"
+            }
+        ];
+
+        // State variables
+        let userAnswers = new Array(quizData.length).fill(null);
+        let isSubmitted = false;
+        let timerSeconds = 3600; // 60 mins
+        let timerInterval;
+
+        // On DOM Load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderQuestions();
+            renderQuestionGrid();
+            startTimer();
+        });
+
+        // Start Countdown Timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    alert("考試時間結束！系統將自動交卷並結算成績。");
+                    submitQuiz();
+                    return;
+                }
+                timerSeconds--;
+                const mins = Math.floor(timerSeconds / 60);
+                const secs = timerSeconds % 60;
+                document.getElementById('timer').textContent = 
+                    `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Render Questions HTML
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            quizData.forEach((q, qIndex) => {
+                const qCard = document.createElement('div');
+                qCard.id = `q-card-${qIndex}`;
+                qCard.className = "bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 transition-all";
+
+                // Question Header
+                let qHeader = `
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-start space-x-3">
+                            <span class="bg-indigo-100 text-indigo-700 font-bold px-2.5 py-1 rounded-lg text-sm shrink-0">
+                                題 ${q.id}
+                            </span>
+                            <h3 class="font-semibold text-slate-800 text-base leading-snug">
+                                ${q.question}
+                            </h3>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full shrink-0">2分</span>
+                    </div>
+                `;
+
+                // Options
+                let optionsHtml = `<div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">`;
+                q.options.forEach((opt, optIndex) => {
+                    optionsHtml += `
+                        <label id="opt-label-${qIndex}-${optIndex}" 
+                               class="flex items-center space-x-3 p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition text-sm text-slate-700">
+                            <input type="radio" 
+                                   name="question-${qIndex}" 
+                                   value="${optIndex}" 
+                                   onchange="selectAnswer(${qIndex}, ${optIndex})"
+                                   class="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-slate-300">
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                });
+                optionsHtml += `</div>`;
+
+                // Rationale Box (Hidden initially)
+                let rationaleHtml = `
+                    <div id="rationale-${qIndex}" class="hidden mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
+                        <div class="font-bold text-slate-800 flex items-center space-x-1">
+                            <i class="fa-solid fa-circle-info text-indigo-500"></i>
+                            <span>題目試題解析：</span>
+                        </div>
+                        <p class="leading-relaxed">${q.rationale}</p>
+                    </div>
+                `;
+
+                qCard.innerHTML = qHeader + optionsHtml + rationaleHtml;
+                container.appendChild(qCard);
+            });
+        }
+
+        // Render Right Sidebar Navigation Buttons Grid
+        function renderQuestionGrid() {
+            const grid = document.getElementById('questionGrid');
+            grid.innerHTML = '';
+
+            quizData.forEach((_, index) => {
+                const btn = document.createElement('button');
+                btn.id = `grid-btn-${index}`;
+                btn.onclick = () => scrollToQuestion(index);
+                btn.className = "w-full aspect-square rounded-lg font-semibold text-xs transition border flex items-center justify-center bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200";
+                btn.textContent = index + 1;
+                grid.appendChild(btn);
+            });
+        }
+
+        // Scroll to specific question
+        function scrollToQuestion(index) {
+            const el = document.getElementById(`q-card-${index}`);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Select option handler
+        function selectAnswer(qIndex, optIndex) {
+            if (isSubmitted) return; // Locked after submission
+
+            userAnswers[qIndex] = optIndex;
+            updateAnsweredCount();
+
+            // Highlight Grid Button
+            const gridBtn = document.getElementById(`grid-btn-${qIndex}`);
+            if (gridBtn) {
+                gridBtn.className = "w-full aspect-square rounded-lg font-semibold text-xs transition border flex items-center justify-center bg-indigo-600 border-indigo-600 text-white shadow-sm";
+            }
+        }
+
+        // Update Answered Counters
+        function updateAnsweredCount() {
+            const count = userAnswers.filter(a => a !== null).length;
+            document.getElementById('answeredCount').textContent = count;
+            document.getElementById('answeredCountBottom').textContent = count;
+        }
+
+        // Confirm Submit Modal
+        function confirmSubmit() {
+            if (isSubmitted) return;
+
+            const unanswered = userAnswers.filter(a => a === null).length;
+            let msg = "確定要提交交卷並計算分數嗎？";
+            if (unanswered > 0) {
+                msg = `您還有 ${unanswered} 題尚未回答，確定要提交嗎？`;
+            }
+
+            if (confirm(msg)) {
+                submitQuiz();
+            }
+        }
+
+        // Main Submit & Grading Function
+        function submitQuiz() {
+            if (isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+
+            let correctCount = 0;
+
+            quizData.forEach((q, qIndex) => {
+                const userAns = userAnswers[qIndex];
+                const qCard = document.getElementById(`q-card-${qIndex}`);
+                const gridBtn = document.getElementById(`grid-btn-${qIndex}`);
+                const rationaleBox = document.getElementById(`rationale-${qIndex}`);
+
+                // Show rationale
+                if (rationaleBox) rationaleBox.classList.remove('hidden');
+
+                // Check answer correctness
+                const isCorrect = (userAns === q.answer);
+
+                if (isCorrect) {
+                    correctCount++;
+                    if (qCard) qCard.classList.add('border-emerald-300', 'bg-emerald-50/20');
+                    if (gridBtn) {
+                        gridBtn.className = "w-full aspect-square rounded-lg font-semibold text-xs transition border flex items-center justify-center bg-emerald-500 border-emerald-500 text-white shadow-sm";
+                    }
+                } else {
+                    if (qCard) qCard.classList.add('border-rose-300', 'bg-rose-50/20');
+                    if (gridBtn) {
+                        gridBtn.className = "w-full aspect-square rounded-lg font-semibold text-xs transition border flex items-center justify-center bg-rose-500 border-rose-500 text-white shadow-sm";
+                    }
+                }
+
+                // Highlight Labels
+                q.options.forEach((_, optIndex) => {
+                    const label = document.getElementById(`opt-label-${qIndex}-${optIndex}`);
+                    if (!label) return;
+
+                    // Disable inputs
+                    const input = label.querySelector('input');
+                    if (input) input.disabled = true;
+
+                    if (optIndex === q.answer) {
+                        // Correct Option (Green)
+                        label.className = "flex items-center space-x-3 p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-medium text-sm";
+                    } else if (optIndex === userAns && !isCorrect) {
+                        // Wrong Selected Option (Red)
+                        label.className = "flex items-center space-x-3 p-3.5 rounded-xl border-2 border-rose-400 bg-rose-50 text-rose-900 text-sm";
+                    } else {
+                        // Normal Option
+                        label.className = "flex items-center space-x-3 p-3.5 rounded-xl border border-slate-200 opacity-60 text-sm text-slate-500";
+                    }
+                });
+            });
+
+            // Calculate Score (2 points per question)
+            const finalScore = correctCount * 2;
+
+            // Render Score Result Card
+            const resultCard = document.getElementById('resultCard');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const passBadge = document.getElementById('passBadge');
+            const resultSummary = document.getElementById('resultSummary');
+
+            resultCard.classList.remove('hidden');
+            scoreDisplay.textContent = finalScore;
+
+            if (finalScore >= 60) {
+                passBadge.className = "inline-block px-4 py-1.5 rounded-full text-sm font-bold bg-emerald-100 text-emerald-700 border border-emerald-200";
+                passBadge.textContent = "及格 (PASS)";
+                resultSummary.textContent = `恭喜通過測驗！答對 ${correctCount} / 50 題。`;
+            } else {
+                passBadge.className = "inline-block px-4 py-1.5 rounded-full text-sm font-bold bg-rose-100 text-rose-700 border border-rose-200";
+                passBadge.textContent = "未及格 (FAILED)";
+                resultSummary.textContent = `請再接再厲！答對 ${correctCount} / 50 題，未達 60 分標準。`;
+            }
+
+            // Scroll Top to View Score Card
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Reset Quiz
+        function resetQuiz() {
+            if (confirm("確定要重頭開始測驗嗎？答案將全部清空。")) {
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
